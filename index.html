@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Video Multilingüe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            --bg-color: #f5efe4;          /* Beige claro */
+            --accent-color: #d28b5c;      /* Resaltado idioma activo */
+            --text-color: #222222;
+            --muted-color: #6b6b6b;
+            --border-soft: #e0d4c4;
+            --radius-pill: 999px;
+            --shadow-soft: 0 14px 35px rgba(0, 0, 0, 0.08);
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont,
+                         "Segoe UI", sans-serif;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-sans);
+            color: var(--text-color);
+            background: var(--bg-color);
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Barra de idiomas */
+        .lang-bar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(245, 239, 228, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        .lang-bar-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            overflow: hidden;
+        }
+
+        .lang-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            border-radius: var(--radius-pill);
+            padding: 0.4rem 0.85rem;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--muted-color);
+            white-space: nowrap;
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                box-shadow 0.2s ease,
+                transform 0.08s ease;
+        }
+
+        .lang-btn .flag {
+            display: inline-block;
+            width: 20px;
+            height: 14px;
+            border-radius: 3px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .flag-es { background-image: url("https://flagcdn.com/w20/mx.png"); }
+        .flag-en { background-image: url("https://flagcdn.com/w20/us.png"); }
+        .flag-fr { background-image: url("https://flagcdn.com/w20/fr.png"); }
+        .flag-de { background-image: url("https://flagcdn.com/w20/de.png"); }
+
+        .lang-btn .label {
+            letter-spacing: 0.08em;
+        }
+
+        .lang-btn:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .lang-btn:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .lang-btn.active {
+            background: var(--accent-color);
+            color: #ffffff;
+            box-shadow: 0 8px 16px rgba(210, 139, 92, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Contenido principal */
+        .content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 1.5rem 1rem 2.5rem;
+        }
+
+        .video-card {
+            width: 100%;
+            max-width: 960px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 28px;
+            padding: 1.5rem 1.5rem 2rem;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .video-header h1 {
+            font-size: 1.4rem;
+            margin: 0 0 0.25rem;
+            letter-spacing: 0.03em;
+        }
+
+        .video-header p {
+            margin: 0;
+            color: var(--muted-color);
+            font-size: 0.95rem;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Estilo del iframe simulando un video 9:16 */
+        .video-wrapper iframe {
+            width: 100%;
+            max-width: 380px;            /* límite razonable para vertical */
+            aspect-ratio: 9 / 16;
+            border-radius: 24px;
+            background: #000;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        @media (max-width: 640px) {
+            .lang-bar-inner {
+                overflow-x: auto;
+                padding-inline: 0.75rem;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
+            }
+
+            .lang-bar-inner::-webkit-scrollbar {
+                height: 6px;
+            }
+
+            .lang-bar-inner::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .lang-bar-inner::-webkit-scrollbar-thumb {
+                background: rgba(0, 0, 0, 0.25);
+                border-radius: 999px;
+            }
+
+            .lang-btn {
+                flex: 0 0 auto;
+            }
+
+            .content {
+                padding: 1.25rem 0.9rem 2rem;
+            }
+
+            .video-card {
+                padding: 1.2rem 1.1rem 1.6rem;
+                border-radius: 22px;
+            }
+
+            .video-header h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- Barra de idiomas -->
+        <header class="lang-bar">
+            <div class="lang-bar-inner">
+                <button class="lang-btn active" data-lang="es" type="button">
+                    <span class="flag flag-es" aria-hidden="true"></span>
+                    <span class="label">ES</span>
+                </button>
+                <button class="lang-btn" data-lang="en" type="button">
+                    <span class="flag flag-en" aria-hidden="true"></span>
+                    <span class="label">EN</span>
+                </button>
+                <button class="lang-btn" data-lang="fr" type="button">
+                    <span class="flag flag-fr" aria-hidden="true"></span>
+                    <span class="label">FR</span>
+                </button>
+                <button class="lang-btn" data-lang="de" type="button">
+                    <span class="flag flag-de" aria-hidden="true"></span>
+                    <span class="label">DE</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Contenido principal -->
+        <main class="content">
+            <section class="video-card">
+                <header class="video-header">
+                    <h1 id="video-title">Video multilingüe</h1>
+                    <p id="video-subtitle">
+                        Selecciona un idioma para reproducir el video automáticamente.
+                    </p>
+                </header>
+
+                <div class="video-wrapper">
+                    <!-- Iframe de Vimeo (9:16) -->
+                    <iframe
+                        id="main-video"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        frameborder="0"
+                        allowfullscreen
+                        src=""
+                    ></iframe>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // IMPORTANTE:
+        // En Vimeo, usa la URL de "Embed" (player.vimeo.com) que aparece en el código
+        // del iframe, por ejemplo:
+        // https://player.vimeo.com/video/123456789?h=abcde12345
+        //
+        // Luego añade parámetros como:
+        // ?autoplay=1&muted=1&title=0&byline=0&portrait=0
+        
+        const videoConfig = {
+            es: {
+                title: "Video en Español",
+                subtitle: "Reproducción automática del material en español.",
+                // REEMPLAZA ESTA URL POR LA DE TU VIDEO EN ESPAÑOL
+                src: "https://player.vimeo.com/video/1140988090?autoplay=1&muted=1&title=0&byline=0&portrait=0"
+            },
+            en: {
+                title: "Video in English",
+                subtitle: "Automatic playback of the English video.",
+                // REEMPLAZA ESTA URL POR LA DE TU VIDEO EN INGLÉS
+                src: "https://player.vimeo.com/video/1140988304?autoplay=1&muted=1&title=0&byline=0&portrait=0"
+            },
+            fr: {
+                title: "Vidéo en Français",
+                subtitle: "Lecture automatique de la vidéo en français.",
+                // REEMPLAZA ESTA URL POR LA DE TU VIDEO EN FRANCÉS
+                src: "https://player.vimeo.com/video/1140988276?autoplay=1&muted=1&title=0&byline=0&portrait=0"
+            },
+            de: {
+                title: "Video auf Deutsch",
+                subtitle: "Automatische Wiedergabe des deutschen Videos.",
+                // REEMPLAZA ESTA URL POR LA DE TU VIDEO EN ALEMÁN
+                src: "https://player.vimeo.com/video/1140988057?autoplay=1&muted=1&title=0&byline=0&portrait=0"
+            }
+        };
+
+        const langButtons   = document.querySelectorAll(".lang-btn");
+        const videoFrame    = document.getElementById("main-video");
+        const videoTitle    = document.getElementById("video-title");
+        const videoSubtitle = document.getElementById("video-subtitle");
+
+        function setLanguage(langKey) {
+            const config = videoConfig[langKey];
+            if (!config) return;
+
+            videoTitle.textContent    = config.title;
+            videoSubtitle.textContent = config.subtitle;
+
+            // Esto se ejecuta DESPUÉS de un clic del usuario,
+            // así que el autoplay del iframe sí se permite.
+            videoFrame.src = config.src;
+
+            // Actualizamos el botón activo
+            langButtons.forEach((btn) => {
+                btn.classList.toggle("active", btn.dataset.lang === langKey);
+            });
+        }
+
+        // Listeners de los botones
+        langButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const lang = btn.dataset.lang;
+                setLanguage(lang);
+            });
+        });
+
+        // NOTA: No cargamos ningún video al inicio.
+        // El primer video se cargará y reproducirá automáticamente
+        // hasta que el usuario haga clic en un idioma.
+    </script>
+</body>
+</html>
