@@ -254,7 +254,7 @@
         //
         // Luego añade parámetros como:
         // ?autoplay=1&muted=1&title=0&byline=0&portrait=0
-        
+
         const videoConfig = {
             es: {
                 title: "Video en Español",
@@ -312,9 +312,9 @@
             });
         });
 
-        // NOTA: No cargamos ningún video al inicio.
-        // El primer video se cargará y reproducirá automáticamente
-        // hasta que el usuario haga clic en un idioma.
+        document.addEventListener('DOMContentLoaded', () => {
+            setLanguage('es');
+        });
     </script>
 </body>
 </html>
